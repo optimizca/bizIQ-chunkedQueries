@@ -1,7 +1,7 @@
 #/bin/bash
 
 usage="$(basename "$0") --apiUrl=URL_TO_EVENTS_SERVICE --duration=duration_min --account=GLOBAL_CUSTOMER_NAME --apiKey=ANALYTICS_API_KEY --query=QUERY_TO_RUN_IN_QUOTES --file=OUTPUT_FILE_NAME"
-example="$(basename "$0") --apiUrl=analytics.api.appdynamics.com --duration=30 --account=customer1_12345-6789-abc-def --apiKey=123456-zyx-987-456-0c8ea754be53 --query=\"SELECT \* FROM transactions\" --file=/foo/bar/output.txt"
+example="$(basename "$0") --apiUrl=http(s)://analytics.api.appdynamics.com --duration=30 --account=customer1_12345-6789-abc-def --apiKey=123456-zyx-987-456-0c8ea754be53 --query=\"SELECT \* FROM transactions\" --file=/foo/bar/output.txt"
 
 # Evaulate options
 while :; do
@@ -59,14 +59,14 @@ function checkSize () {
 
     countsub=${query#* FROM}
     countQuery="SELECT count(*) FROM $countsub"
-
+echo $countQuery 
     if echo $countQuery | grep -i "order by"; then
 	    countQuery=${countQuery%ORDER BY*}
     fi
 
     echo "Count Query = $countQuery"
 
-    countString=`/usr/bin/curl -X POST "http://${apiUrl}/events/query?start=${start}&end=${end}&limit=${limit}" -H"X-Events-API-AccountName:${account}" -H"X-Events-API-Key:${apiKey}" -H"Content-type: application/vnd.appd.events+text;v=2" -d "${countQuery}"`
+    countString=`/usr/bin/curl -X POST "${apiUrl}/events/query?start=${start}&end=${end}&limit=${limit}" -H"X-Events-API-AccountName:${account}" -H"X-Events-API-Key:${apiKey}" -H"Content-type: application/vnd.appd.events+text;v=2" -d "${countQuery}"`
 
     echo $countString
     sub=${countString#*results\":[[}
@@ -92,9 +92,9 @@ function runLoops () {
 
 function runQuery () {
     echo "Running Query with Start = $start and End = $end"
-    outfile=$1
+    outfile="$1_${start}_${end}.json"
 
-    /usr/bin/curl -X POST "http://${apiUrl}/events/query?start=${start}&end=${end}&limit=${limit}" -H"X-Events-API-AccountName:${account}" -H"X-Events-API-Key:${apiKey}" -H"Content-type: application/vnd.appd.events+text;v=2" -d "${query}" >> $outfile
+    /usr/bin/curl -X POST "${apiUrl}/events/query?start=${start}&end=${end}&limit=${limit}" -H"X-Events-API-AccountName:${account}" -H"X-Events-API-Key:${apiKey}" -H"Content-type: application/vnd.appd.events+text;v=2" -d "${query}" >> $outfile
 
 }
 ##############################################
