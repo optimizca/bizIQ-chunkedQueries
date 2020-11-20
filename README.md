@@ -27,4 +27,4 @@ The script takes several arguments (all required):
 
 Example Usage:
 
-queryBiq.sh --apiUrl=analytics.api.appdynamics.com --start=1503256982000 --end=1503343383000 --account=customer1_12345-6789-abc-def --apiKey=123456-zyx-987-456-0c8ea754be53 --query="SELECT \* FROM transactions" --file=/foo/bar/output.txt
+./queryBiq_duration.sh --apiUrl=https://analytics.api.appdynamics.com —duration=15 --account= --apiKey=5 --query="SELECT segments.errorList.errorCode, segments.errorList.errorDetail, segments.userData.DNIS, segments.userData.UniqueId, segments.userData.CALL_SESSIONID, transactionName FROM transactions WHERE segments.errorList.errorCode is NOT NULL" --file=output.json
